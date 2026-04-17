@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ cv.summary[:40] }} — CV</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    font-size: 10.5pt;
+    line-height: 1.45;
+    color: #1a1a1a;
+    background: #fff;
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 32px 40px;
+  }
+
+  /* Header */
+  .header { border-bottom: 2px solid #1a1a1a; padding-bottom: 10px; margin-bottom: 14px; }
+  .name { font-size: 22pt; font-weight: bold; letter-spacing: 0.5px; }
+  .contact {
+    font-family: Arial, sans-serif;
+    font-size: 9pt;
+    color: #444;
+    margin-top: 4px;
+  }
+  .contact a { color: #1a5276; text-decoration: none; }
+
+  /* Section headings */
+  h2 {
+    font-family: Arial, sans-serif;
+    font-size: 10pt;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 3px;
+    margin: 16px 0 8px 0;
+    color: #1a1a1a;
+  }
+
+  /* Summary */
+  .summary { font-size: 10pt; color: #333; margin-bottom: 6px; }
+
+  /* Experience / Projects */
+  .entry { margin-bottom: 12px; }
+  .entry-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .entry-title { font-weight: bold; font-size: 10.5pt; }
+  .entry-company { font-style: italic; color: #333; }
+  .entry-date {
+    font-family: Arial, sans-serif;
+    font-size: 9pt;
+    color: #555;
+    white-space: nowrap;
+  }
+  .entry-stack {
+    font-family: Arial, sans-serif;
+    font-size: 8.5pt;
+    color: #1a5276;
+    margin: 2px 0 4px 0;
+  }
+  ul { padding-left: 18px; margin-top: 4px; }
+  li { margin-bottom: 2px; font-size: 10pt; }
+
+  /* Skills */
+  .skills-grid {
+    font-family: Arial, sans-serif;
+    font-size: 9.5pt;
+    columns: 2;
+    column-gap: 20px;
+  }
+  .skill-category { font-weight: bold; color: #1a1a1a; }
+
+  /* Education */
+  .edu-entry { margin-bottom: 8px; }
+  .edu-degree { font-weight: bold; }
+  .edu-institution { font-style: italic; color: #444; }
+  .edu-note {
+    font-family: Arial, sans-serif;
+    font-size: 9pt;
+    color: #555;
+  }
+
+  /* Languages */
+  .languages {
+    font-family: Arial, sans-serif;
+    font-size: 9.5pt;
+  }
+
+  /* ATS note (hidden in PDF, visible for review) */
+  .ats-note {
+    margin-top: 20px;
+    padding: 8px;
+    background: #f8f9fa;
+    border-left: 3px solid #1a5276;
+    font-family: Arial, sans-serif;
+    font-size: 8pt;
+    color: #555;
+    display: none; /* hidden in final PDF */
+  }
+</style>
+</head>
+<body>
+
+<!-- ── HEADER ───────────────────────────────────────────── -->
+<div class="header">
+  <div class="name">Salim Tagougui</div>
+  <div class="contact">
+    Fes, Morocco &nbsp;|&nbsp;
+    <a href="mailto:salim@salimtag.tech">salim@salimtag.tech</a> &nbsp;|&nbsp;
+    <a href="https://salimtag.tech">salimtag.tech</a> &nbsp;|&nbsp;
+    <a href="https://github.com/salimtag">github.com/salimtag</a> &nbsp;|&nbsp;
+    <a href="https://linkedin.com/in/salimtag">linkedin.com/in/salimtag</a>
+  </div>
+</div>
+
+<!-- ── SUMMARY ──────────────────────────────────────────── -->
+{% if cv.summary %}
+<h2>Profile</h2>
+<div class="summary">{{ cv.summary }}</div>
+{% endif %}
+
+<!-- ── EXPERIENCE ───────────────────────────────────────── -->
+{% if cv.experience %}
+<h2>Experience</h2>
+{% for exp in cv.experience %}
+<div class="entry">
+  <div class="entry-header">
+    <span>
+      <span class="entry-title">{{ exp.title }}</span>
+      {% if exp.company %} &nbsp;—&nbsp; <span class="entry-company">{{ exp.company }}</span>{% endif %}
+    </span>
+    <span class="entry-date">{{ exp.duration }}</span>
+  </div>
+  {% if exp.bullets %}
+  <ul>
+    {% for bullet in exp.bullets %}
+    <li>{{ bullet }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+</div>
+{% endfor %}
+{% endif %}
+
+<!-- ── PROJECTS ─────────────────────────────────────────── -->
+{% if cv.projects %}
+<h2>Projects</h2>
+{% for project in cv.projects %}
+<div class="entry">
+  <div class="entry-header">
+    <span class="entry-title">{{ project.name }}</span>
+  </div>
+  {% if project.stack %}
+  <div class="entry-stack">{{ project.stack | join(' · ') }}</div>
+  {% endif %}
+  <div style="font-size: 10pt;">{{ project.description }}</div>
+  {% if project.highlights %}
+  <ul>
+    {% for h in project.highlights %}
+    <li>{{ h }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+</div>
+{% endfor %}
+{% endif %}
+
+<!-- ── SKILLS ───────────────────────────────────────────── -->
+{% if cv.skills %}
+<h2>Technical Skills</h2>
+<div class="skills-grid">
+  {{ cv.skills | join(' &nbsp;·&nbsp; ') }}
+</div>
+{% endif %}
+
+<!-- ── EDUCATION ────────────────────────────────────────── -->
+{% if cv.education %}
+<h2>Education</h2>
+{% for edu in cv.education %}
+<div class="edu-entry">
+  <div>
+    <span class="edu-degree">{{ edu.degree }}</span>
+    &nbsp;—&nbsp;
+    <span class="edu-institution">{{ edu.institution }}</span>
+    {% if edu.year %}<span class="entry-date" style="margin-left:8px;">{{ edu.year }}</span>{% endif %}
+  </div>
+  {% if edu.notes %}
+  <div class="edu-note">{{ edu.notes }}</div>
+  {% endif %}
+</div>
+{% endfor %}
+{% endif %}
+
+<!-- ── LANGUAGES ────────────────────────────────────────── -->
+<h2>Languages</h2>
+<div class="languages">
+  Arabic (Native) &nbsp;·&nbsp; French (Fluent) &nbsp;·&nbsp; English (Fluent)
+</div>
+
+<!-- ── TAILORED FOR (review note, hidden in PDF) ────────── -->
+<div class="ats-note">
+  <strong>Tailored for:</strong> {{ job.role }} at {{ job.company }} ({{ job.market }})<br>
+  <strong>ATS Keywords:</strong> {{ cv.ats_keywords | join(', ') }}
+</div>
+
+</body>
+</html>
