@@ -10,6 +10,7 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import shutil
+from uuid import uuid4
 from datetime import datetime
 from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
@@ -57,7 +58,7 @@ def _make_filename(job: ParsedJob, ext: str) -> str:
     date_str = datetime.now().strftime("%Y-%m-%d")
     company = "".join(c if c.isalnum() else "_" for c in job.company)[:20]
     role = "".join(c if c.isalnum() else "_" for c in job.role)[:20]
-    return f"{company}_{role}_{date_str}.{ext}"
+    return f"{company}_{role}_{date_str}_{uuid4().hex}.{ext}"
 
 
 def render_cv_html(cv: TailoredCV, job: ParsedJob) -> str:

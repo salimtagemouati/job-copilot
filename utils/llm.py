@@ -284,12 +284,13 @@ def call_llm_structured(
     try:
         return output_schema.model_validate(json.loads(_clean_json(raw)))
     except (json.JSONDecodeError, ValidationError) as e:
-        logger.warning(f"[{purpose}] Parse failed, sending correction: {e}")
+        validation_error = str(e)
+        logger.warning(f"[{purpose}] Parse failed, sending correction")
 
     # Attempt 2 — correction prompt
     correction = (
         f"Your previous response was not valid JSON or did not match the schema.\n"
-        f"Error: {e}\n\nPrevious response:\n{raw}\n\nOriginal request:\n{prompt}\n\n"
+        f"Error: {validation_error}\n\nPrevious response:\n{raw}\n\nOriginal request:\n{prompt}\n\n"
         f"Return ONLY valid JSON matching the schema. No preamble. No backticks."
     )
     raw2 = call_llm(
