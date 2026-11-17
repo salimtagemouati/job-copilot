@@ -1,6 +1,6 @@
 [build-system]
 requires = ["setuptools>=68", "wheel"]
-build-backend = "setuptools.backends.legacy:build"
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "job-copilot"
@@ -51,11 +51,19 @@ job-copilot = "main:app"
 
 [project.urls]
 Homepage    = "https://salimtag.tech"
-Repository  = "https://github.com/salimtag/job-copilot"
+Repository  = "https://github.com/salimtagemouati/job-copilot"
 Portfolio   = "https://salimtag.tech/#projects"
 
 [tool.setuptools.packages.find]
-exclude = ["tests*", "demo*"]
+include = ["api*", "cover_letter*", "cv_generator*", "ingestion*", "interview_prep*", "models*", "prompts", "scoring*", "skill_gap*", "tracker*", "utils*"]
+exclude = ["*.__pycache__*"]
+
+[tool.setuptools]
+py-modules = ["main", "config"]
+
+[tool.setuptools.package-data]
+prompts = ["*.j2"]
+cv_generator = ["templates/*.html"]
 
 [tool.ruff]
 line-length = 100

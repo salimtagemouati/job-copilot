@@ -90,6 +90,9 @@ def check_germany_eligibility(job: ParsedJob) -> tuple[bool, str]:
     combined_text = _normalize(job.raw_text + " " + job.role + " " + job.location)
     jd_lang = _normalize(job.jd_language)
 
+    if any(phrase in combined_text for phrase in ("german required", "german is required", "fluent german required", "german proficiency required")) or _normalize(job.language_required) in {"german", "english and german", "german and english"}:
+        return False, "German language proficiency is required."
+
     # ── Auto-reject: JD is entirely in German with no English signals ─────────
     if jd_lang == "german":
         # Check if any English pass phrase redeems it
@@ -164,6 +167,11 @@ def check_canada_eligibility(job: ParsedJob) -> tuple[bool, str]:
         (is_eligible, reason) tuple
     """
     combined = _normalize(job.raw_text)
+    if job.visa_sponsorship is False or any(phrase in combined for phrase in (
+        "no visa sponsorship", "no sponsorship", "cannot sponsor", "do not sponsor",
+        "not offer sponsorship", "sponsorship is not available", "no lmia",
+    )):
+        return False, "The posting excludes sponsorship."
     has_signal = any(p in combined for p in CANADA_PASS_PHRASES)
 
     if not has_signal:

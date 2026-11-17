@@ -12,7 +12,9 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from fastapi import FastAPI, HTTPException, BackgroundTasks
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi import Depends
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from secrets import compare_digest
 from pydantic import BaseModel
 from typing import Optional
 
@@ -25,21 +27,22 @@ from utils.logger import get_logger
 
 logger = get_logger(__name__)
 
+def require_api_token(credentials: HTTPAuthorizationCredentials | None = Depends(HTTPBearer(auto_error=False))):
+    token = os.environ.get("JOB_COPILOT_API_TOKEN")
+    if not token or len(token) < 32:
+        raise HTTPException(status_code=503, detail="Configure JOB_COPILOT_API_TOKEN first")
+    if not credentials or not compare_digest(credentials.credentials.encode(), token.encode()):
+        raise HTTPException(status_code=401, detail="Bearer token required", headers={"WWW-Authenticate": "Bearer"})
+
+
 app = FastAPI(
+    dependencies=[Depends(require_api_token)],
     title="AI Job Copilot API",
     description="Salim's personal AI career assistant — REST API",
     version="1.0.0",
     docs_url="/docs",
     redoc_url="/redoc",
 )
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # tighten in production
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
 
 # ── Request / Response models ──────────────────────────────────────────────────
 
@@ -218,4 +221,4 @@ def export_tracker_csv(market: Optional[str] = None, status: Optional[str] = Non
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("api.routes:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("api.routes:app", host="127.0.0.1", port=8000, reload=True)
